@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIXTURN PROTOCOL - COMPANION APP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Vixturn Companion App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -14,285 +12,275 @@
             --vix-purple: #7b2cbf;
             --vix-neon: #9d4edd;
             --vix-cyan: #00f3ff;
+            --vix-bg-card: rgba(10, 10, 15, 0.95);
+            --vix-red: #ff0055;
+            --nav-height: 65px;
         }
 
-        body { 
-            background-color: var(--vix-black); 
-            color: white;
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--vix-black);
+            color: #ffffff;
             font-family: 'Rajdhani', sans-serif;
-            padding-bottom: 90px;
+            margin: 0;
+            padding: 0;
+            padding-bottom: var(--nav-height);
             overflow-x: hidden;
+            background-image: linear-gradient(rgba(5, 5, 5, 0.9), rgba(5, 5, 5, 0.9)), 
+                              url('https://vixturn.com/wp-content/uploads/2024/01/bg-vix.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        h1, h2, h3, .font-vix { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
-
-        /* Effet Scanlines (Cahier des charges 3.3) */
-        body::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 9999;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
+        /* --- AUTH SCREEN --- */
+        #auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--vix-black);
+            background-image: linear-gradient(rgba(5, 5, 5, 0.95), rgba(5, 5, 5, 0.95)), url('https://vixturn.com/wp-content/uploads/2024/01/bg-vix.jpg');
+            background-size: cover; z-index: 2000; display: flex; flex-direction: column; justify-content: center; padding: 20px; overflow-y: auto;
         }
+        .auth-card { background: rgba(10, 10, 20, 0.95); border: 1px solid var(--vix-purple); padding: 25px; clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%); box-shadow: 0 0 20px rgba(123, 44, 191, 0.2); max-width: 400px; margin: 0 auto; width: 100%; }
+        .auth-title { font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.5rem; color: var(--vix-cyan); margin-bottom: 20px; text-transform: uppercase; }
+        .auth-switch { text-align: center; margin-top: 15px; font-size: 0.8rem; color: #aaa; }
+        .auth-switch span { color: var(--vix-neon); cursor: pointer; text-decoration: underline; }
+        .hidden { display: none !important; }
 
-        /* Boutons avec effet Glow/Néon (Cahier des charges 3.3) */
-        .vix-btn {
-            background: rgba(157, 78, 221, 0.2);
-            border: 1px solid var(--vix-neon);
-            box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-            transition: 0.3s;
-        }
-        .vix-btn:active { transform: scale(0.95); box-shadow: 0 0 20px var(--vix-cyan); border-color: var(--vix-cyan); }
+        /* --- GLOBAL EFFECTS --- */
+        body::before { content: " "; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02)); background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 999; }
+        .page-section { display: none; padding: 20px; animation: fadeIn 0.3s ease-in-out; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .nav-button { color: #444; transition: 0.3s; }
-        .active-tab { color: var(--vix-neon) !important; text-shadow: 0 0 10px var(--vix-neon); }
+        .section-title, .main-title { font-family: 'Orbitron', sans-serif; color: var(--vix-cyan); text-transform: uppercase; margin-bottom: 20px; border-left: 4px solid var(--vix-purple); padding-left: 10px; }
+        .main-title span { color: var(--vix-cyan); text-shadow: 0 0 10px var(--vix-cyan); }
         
-        .card-cyber {
-            background: rgba(20, 20, 20, 0.8);
-            border-left: 3px solid var(--vix-neon);
-            position: relative;
-        }
+        /* --- NAVIGATION --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height); background: rgba(5, 5, 5, 0.95); border-top: 1px solid var(--vix-purple); display: flex; justify-content: space-around; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; font-size: 0.6rem; font-family: 'Orbitron', sans-serif; text-decoration: none; width: 20%; height: 100%; transition: 0.2s; }
+        .nav-icon { font-size: 1.2rem; }
+        .nav-item.active { color: var(--vix-cyan); text-shadow: 0 0 8px rgba(0, 243, 255, 0.4); border-top: 2px solid var(--vix-cyan); }
 
-        .xp-bar { height: 4px; background: #222; width: 100%; border-radius: 2px; margin-top: 5px; overflow: hidden; }
-        .xp-progress { height: 100%; background: var(--vix-cyan); box-shadow: 0 0 10px var(--vix-cyan); }
+        /* --- CARDS & UI --- */
+        .match-card, .win-card, .quest-card, .shop-card, .roster-card { background: rgba(123, 44, 191, 0.1); border: 1px solid var(--vix-purple); padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%); transition: 0.3s; }
+        .team { display: flex; flex-direction: column; align-items: center; width: 35%; }
+        .team img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
+        .team-name { font-size: 0.7rem; text-transform: uppercase; text-align: center; }
+        .match-time { font-family: 'Orbitron', sans-serif; color: var(--vix-cyan); font-size: 0.9rem; }
+
+        .vix-btn { width: 100%; padding: 12px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; text-transform: uppercase; border: none; cursor: pointer; transition: 0.3s; margin-top: 10px; clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%); text-decoration: none; display: block; text-align: center; }
+        .btn-primary { background: var(--vix-purple); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--vix-cyan); color: var(--vix-cyan); padding: 6px 10px; font-size: 0.6rem; width: auto; margin-top: 0; }
+        .btn-logout { background: transparent; border: 1px solid var(--vix-red); color: var(--vix-red); margin-top: 30px; }
+
+        .profile-card { background: var(--vix-bg-card); border-left: 3px solid var(--vix-cyan); padding: 20px; margin-bottom: 20px; clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%); }
+        .vc-balance { float: right; color: var(--vix-neon); font-family: 'Orbitron'; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div class="p-5 border-b border-gray-800 bg-black/90 sticky top-0 z-50 flex justify-between items-center">
-        <div>
-            <div class="text-[10px] text-cyan-400 font-vix tracking-widest">AGENT STATUS: ACTIVE</div>
-            <h1 class="text-lg font-bold">VIXTURN <span class="text-[#9d4edd]">PROTOCOL</span></h1>
+    <div id="auth-overlay">
+        <div id="login-form" class="auth-card">
+            <h2 class="auth-title">PROTOCOL LOGIN</h2>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">Pseudo</label><input type="text" id="login-pseudo" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">ID (VIX-XXX)</label><input type="text" id="login-id" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">Email</label><input type="email" id="login-email" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <div style="font-size: 0.8rem; margin-top: 10px;"><input type="checkbox" id="login-remember"> Rester connecté</div>
+            <button class="vix-btn btn-primary" onclick="Auth.login()">INITIALISER</button>
+            <div class="auth-switch">Pas encore Agent ? <span onclick="Auth.showRegister()">Créer un compte</span></div>
         </div>
-        <div class="text-right">
-            <div class="flex items-center justify-end text-[#9d4edd] font-bold">
-                <span id="vc-balance">0</span> 
-                <span class="text-[10px] ml-1">VC</span>
-            </div>
-            <div class="xp-bar w-24 ml-auto">
-                <div class="xp-progress" style="width: 40%"></div>
+        <div id="register-form" class="auth-card hidden">
+            <h2 class="auth-title">NEW AGENT REGISTRY</h2>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">Pseudo</label><input type="text" id="reg-pseudo" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">Identifiant Unique</label><input type="text" id="reg-id" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">Email</label><input type="email" id="reg-email" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <div class="input-group"><label style="font-size:0.7rem; color:#888;">Date de Naissance (+15 ans)</label><input type="date" id="reg-dob" style="width:100%; background:rgba(255,255,255,0.05); border:1px solid #333; color:white; padding:10px;"></div>
+            <button class="vix-btn btn-primary" onclick="Auth.register()">VALIDER</button>
+            <div class="auth-switch">Déjà Agent ? <span onclick="Auth.showLogin()">Se connecter</span></div>
+        </div>
+    </div>
+
+    <div id="page-home" class="page-section active">
+        <div id="view-list">
+            <div class="section-title">COMMAND CENTER / MATCHS</div>
+            <div id="match-container"></div>
+        </div>
+        <div id="view-detail" style="display:none; text-align:center;">
+            <div onclick="showList()" style="color:var(--vix-cyan); cursor:pointer; text-align:left; margin-bottom:20px;"> < RETOUR </div>
+            <div style="border:1px solid var(--vix-purple); padding:20px; background: rgba(0,0,0,0.5);">
+                <div id="detail-teams" style="font-family:'Orbitron'; font-size:1.2rem;"></div>
+                <div id="detail-hour" style="color:var(--vix-cyan); font-size:2rem; margin:10px 0;"></div>
+                <a href="https://www.twitch.tv/nefastinho_rl" target="_blank" class="vix-btn btn-primary">VOIR SUR TWITCH</a>
             </div>
         </div>
     </div>
 
-    <div id="app-content" class="p-4 space-y-6"></div>
+    <div id="page-palmares" class="page-section">
+        <div class="main-title">PALMARES <span>OFFICIEL</span></div>
+        <div class="win-card">
+            <div style="width: 70%;">
+                <h3 style="margin:0; font-family:'Orbitron'; font-size: 1rem;">Winged Deer Tournament</h3>
+                <p style="color:var(--vix-cyan); margin: 5px 0; font-size: 0.8rem;">🏆 VAINQUEUR</p>
+            </div>
+            <a href="https://liquipedia.net/rocketleague/Winged_Deer_Tournament" target="_blank" class="vix-btn btn-outline">LIQUIPEDIA</a>
+        </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-purple-900/50 flex justify-around p-4 z-[10000]">
-        <button onclick="renderHome()" class="nav-button" id="tab-home">
-            <i class="material-icons">terminal</i><br><span class="text-[9px] uppercase">Hub</span>
-        </button>
-        <button onclick="renderEsport()" class="nav-button" id="tab-esport">
-            <i class="material-icons">event</i><br><span class="text-[9px] uppercase">Matchs</span>
-        </button>
-        <button onclick="renderMarket()" class="nav-button" id="tab-market">
-            <i class="material-icons">shopping_cart</i><br><span class="text-[9px] uppercase">Market</span>
-        </button>
-        <button onclick="renderLadder()" class="nav-button" id="tab-ladder">
-            <i class="material-icons">leaderboard</i><br><span class="text-[9px] uppercase">Ladder</span>
-        </button>
+        <div class="main-title" style="margin-top:40px;">AGENTS <span>SUR LE TERRAIN</span></div>
+        <div class="roster-card">
+            <div style="width:100%">
+                <p style="color:var(--vix-neon); font-family:'Orbitron'; font-size:0.7rem; margin-bottom:5px;">COACH</p>
+                <h3 style="margin:0; font-family:'Orbitron';">NEFASTINHO</h3>
+            </div>
+        </div>
+        <div class="roster-card">
+            <div style="width:100%">
+                <p style="color:var(--vix-cyan); font-family:'Orbitron'; font-size:0.7rem; margin-bottom:5px;">JOUEUR STAR</p>
+                <h3 style="margin:0; font-family:'Orbitron';">COSMOS</h3>
+            </div>
+        </div>
+        <div class="roster-card">
+            <div style="width:100%">
+                <p style="color:var(--vix-cyan); font-family:'Orbitron'; font-size:0.7rem; margin-bottom:5px;">JOUEUR</p>
+                <h3 style="margin:0; font-family:'Orbitron';">SM7</h3>
+            </div>
+        </div>
+        <div class="roster-card">
+            <div style="width:100%">
+                <p style="color:var(--vix-cyan); font-family:'Orbitron'; font-size:0.7rem; margin-bottom:5px;">JOUEUR</p>
+                <h3 style="margin:0; font-family:'Orbitron';">KAMPPU</h3>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-boutique" class="page-section">
+        <h2 class="main-title">QUÊTES <span>VIX-PASS</span> <span id="wallet-display" style="float:right; font-size:0.8rem; color:var(--vix-neon);">0 VC</span></h2>
+        <div id="quest-list"></div>
+        <h2 class="main-title" style="margin-top:40px;">BLACK <span>MARKET</span></h2>
+        <div id="shop-list">
+            <div class="shop-card"><div><h4>WALLPAPER VIX-01</h4><p>50 VC</p></div><button class="vix-btn btn-outline" style="background:var(--vix-cyan); color:black;" onclick="App.buyItem('Wallpaper HD', 50)">ACHETER</button></div>
+            <div class="shop-card"><div><h4>ROLE DISCORD</h4><p>150 VC</p></div><button class="vix-btn btn-outline" style="background:var(--vix-cyan); color:black;" onclick="App.buyItem('Role Discord', 150)">ACHETER</button></div>
+        </div>
+    </div>
+
+    <div id="page-reseaux" class="page-section">
+        <div class="main-title">PROTOCOL <span>LINKS</span></div>
+        <a href="https://discord.gg/9aVNfjEyn4" target="_blank" class="vix-btn btn-primary" style="background:#5865F2; margin-bottom:12px;">DISCORD</a>
+        <a href="https://x.com/Vixturn_esports?s=20" target="_blank" class="vix-btn btn-primary" style="background:#000; border:1px solid #333; margin-bottom:12px;">TWITTER / X</a>
+        <a href="https://www.twitch.tv/nefastinho_rl" target="_blank" class="vix-btn btn-primary" style="background:#9146FF; margin-bottom:12px;">TWITCH</a>
+        <a href="https://www.instagram.com/vixturn_esports?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="vix-btn btn-primary" style="background:linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); margin-bottom:12px;">INSTAGRAM</a>
+        <a href="https://https://www.tiktok.com/@vixturn_esports?is_from_webapp=1&sender_device=pc" target="_blank" class="vix-btn btn-primary" style="background:#000; margin-bottom:12px;">TIKTOK</a>
+        <a href="https://vixturn.com" target="_blank" class="vix-btn btn-primary" style="background:var(--vix-purple); margin-bottom:12px;">SITE OFFICIEL</a>
+    </div>
+
+    <div id="page-compte" class="page-section">
+        <div class="main-title">AGENT <span>DOSSIER</span></div>
+        <div class="profile-card">
+            <span class="vc-balance" id="profile-balance">0 VC</span>
+            <span id="profile-id" style="font-size:0.7rem; color:#888;">ID: --</span>
+            <h2 id="profile-pseudo" style="margin:5px 0; font-family:'Orbitron';">Pseudo</h2>
+            <p style="margin:0; font-size: 0.8rem; color: var(--vix-cyan);">Rang: Agent Certifié</p>
+        </div>
+        <button class="vix-btn btn-logout" onclick="Auth.logout()">DÉCONNEXION DU SYSTÈME</button>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="switchPage('home', this); return false;"><span class="nav-icon">🏠</span><span>HUB</span></a>
+        <a href="#" class="nav-item" onclick="switchPage('palmares', this); return false;"><span class="nav-icon">🏆</span><span>WINS</span></a>
+        <a href="#" class="nav-item" onclick="switchPage('boutique', this); return false;"><span class="nav-icon">🎯</span><span>PASS</span></a>
+        <a href="#" class="nav-item" onclick="switchPage('reseaux', this); return false;"><span class="nav-icon">🌐</span><span>LINKS</span></a>
+        <a href="#" class="nav-item" onclick="switchPage('compte', this); return false;"><span class="nav-icon">👤</span><span>USER</span></a>
     </nav>
 
     <script>
-        // --- ÉTAT DE L'APPLICATION (Basé sur le cahier des charges) ---
-        let state = {
-            vixCoins: 250,
-            level: 5,
-            rank: 124,
-            dailyClaimed: false,
-            inventory: []
+        const VIX_LOGO = "https://image2url.com/r2/default/images/1770310382287-61869747-2e12-4d81-9f4b-a49c2d9628cb.png";
+        const MATCHES = [
+            { id: 1, t1: "Vixturn", t2: "BDS", h: "18:00", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/b/b8/Team_BDS_logo.png" },
+            { id: 2, t1: "Vixturn", t2: "Vitality", h: "19:00", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/0/02/Team_Vitality_logo.png" },
+            { id: 3, t1: "Vixturn", t2: "KC", h: "20:30", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/6/6f/Karmine_Corp_logo.png" },
+            { id: 4, t1: "Vixturn", t2: "G2 Stride", h: "21:30", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/e/e0/G2_Esports_logo.png" },
+            { id: 5, t1: "Vixturn", t2: "M8", h: "22:15", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/2/23/Gentle_Mates_logo.png" },
+            { id: 6, t1: "Vixturn", t2: "Oxygen", h: "23:00", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/5/52/Oxygen_Esports_logo.png" },
+            { id: 7, t1: "Vixturn", t2: "Moist", h: "00:00", l1: VIX_LOGO, l2: "https://vignette.wikia.nocookie.net/rocketleague/images/8/82/Moist_Esports_logo.png" }
+        ];
+
+        const Auth = {
+            currentUser: null,
+            init: function() {
+                const s = localStorage.getItem('vix_session');
+                if (s) { this.currentUser = JSON.parse(s); document.getElementById('auth-overlay').style.display = 'none'; App.updateUI(); }
+            },
+            register: function() {
+                const id = document.getElementById('reg-id').value;
+                const p = document.getElementById('reg-pseudo').value;
+                const d = document.getElementById('reg-dob').value;
+                if(!id || !p || !d) return alert("Champs requis !");
+                const u = { id, pseudo: p, balance: 0, claimed: [] };
+                let users = JSON.parse(localStorage.getItem('vix_db') || '[]');
+                users.push(u); localStorage.setItem('vix_db', JSON.stringify(users));
+                alert("Compte créé."); this.showLogin();
+            },
+            login: function() {
+                const id = document.getElementById('login-id').value;
+                const p = document.getElementById('login-pseudo').value;
+                const users = JSON.parse(localStorage.getItem('vix_db') || '[]');
+                const u = users.find(x => x.id === id && x.pseudo === p);
+                if(u) { this.currentUser = u; localStorage.setItem('vix_session', JSON.stringify(u)); document.getElementById('auth-overlay').style.display='none'; App.updateUI(); }
+                else alert("Identifiants incorrects.");
+            },
+            logout: function() { localStorage.removeItem('vix_session'); location.reload(); },
+            showRegister: () => { document.getElementById('login-form').classList.add('hidden'); document.getElementById('register-form').classList.remove('hidden'); },
+            showLogin: () => { document.getElementById('register-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden'); }
         };
 
-        function updateUI() {
-            document.getElementById('vc-balance').innerText = state.vixCoins;
+        const App = {
+            quests: [{id:'q1', t:'INITIALISATION', r:10, d:'Lancer le protocole'}],
+            updateUI: function() {
+                if(!Auth.currentUser) return;
+                document.getElementById('wallet-display').innerText = Auth.currentUser.balance + " VC";
+                document.getElementById('profile-balance').innerText = Auth.currentUser.balance + " VC";
+                document.getElementById('profile-id').innerText = "ID: " + Auth.currentUser.id;
+                document.getElementById('profile-pseudo').innerText = Auth.currentUser.pseudo;
+                this.renderQuests();
+            },
+            renderQuests: function() {
+                document.getElementById('quest-list').innerHTML = this.quests.map(q => {
+                    const done = Auth.currentUser.claimed.includes(q.id);
+                    return `<div class="quest-card"><div><h4>${q.t}</h4><p>+${q.r} VC</p></div><button class="vix-btn btn-outline" ${done?'disabled':''} onclick="App.claim('${q.id}',${q.r})">${done?'ACQUIS':'RECLAMER'}</button></div>`;
+                }).join('');
+            },
+            claim: function(id, r) {
+                Auth.currentUser.balance += r; Auth.currentUser.claimed.push(id);
+                localStorage.setItem('vix_session', JSON.stringify(Auth.currentUser)); this.updateUI();
+            },
+            buyItem: (n,p) => { if(Auth.currentUser.balance>=p){ Auth.currentUser.balance-=p; localStorage.setItem('vix_session', JSON.stringify(Auth.currentUser)); App.updateUI(); alert("Aquis: "+n); } else alert("Fonds insuffisants."); }
+        };
+
+        function switchPage(p, el) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('page-' + p).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active'); window.scrollTo(0,0);
         }
 
-        // --- SECTION 2.1 : HUB "COMMAND CENTER" ---
-        function renderHome() {
-            setActive('home');
-            document.getElementById('app-content').innerHTML = `
-                <div class="card-cyber p-4 bg-purple-900/10 mb-4">
-                    <h3 class="text-xs text-cyan-400 mb-2">Quête Journalière</h3>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm">Lancer le protocole (Check-in)</span>
-                        <button onclick="claimDaily()" id="daily-btn" class="vix-btn px-4 py-1 text-xs ${state.dailyClaimed ? 'opacity-50' : ''}">
-                            ${state.dailyClaimed ? 'TERMINÉ' : '+50 VC'}
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card-cyber p-5 border-l-cyan-400 bg-cyan-900/5">
-                    <div class="text-[10px] text-cyan-400 mb-1">PROCHAIN MATCH RLCS</div>
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <div class="text-2xl font-vix">VIXTURN vs KC</div>
-                            <div class="text-xs text-gray-500">OPEN QUALIFIER #3</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xl font-vix text-cyan-400">14:02:55</div>
-                            <button class="text-[10px] underline text-purple-400">NOTIFY ME</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-cyber p-4">
-                    <h3 class="text-xs mb-3">Watch-to-Earn (Code Stream)</h3>
-                    <div class="flex gap-2">
-                        <input type="text" id="stream-code" placeholder="ENTRER LE CODE..." class="bg-black border border-gray-700 p-2 text-xs flex-1 font-vix">
-                        <button onclick="redeemCode()" class="vix-btn px-4 py-2 text-xs">ACTIVER</button>
-                    </div>
-                </div>
-            `;
+        function renderMatches() {
+            document.getElementById('match-container').innerHTML = MATCHES.map(m => `
+                <div class="match-card" onclick="showDetail(${m.id})">
+                    <div class="team"><img src="${m.l1}"><span class="team-name">${m.t1}</span></div>
+                    <div class="match-time">${m.h}</div>
+                    <div class="team"><img src="${m.l2}"><span class="team-name">${m.t2}</span></div>
+                </div>`).join('');
         }
-
-        // --- SECTION 2.1 & 5 : E-SPORT & PRÉDICTIONS ---
-        function renderEsport() {
-            setActive('esport');
-            document.getElementById('app-content').innerHTML = `
-                <div class="flex gap-2 mb-4">
-                    <button class="flex-1 vix-btn py-2 text-xs font-bold text-cyan-400">CALENDRIER</button>
-                    <button onclick="renderPalmares()" class="flex-1 border border-gray-800 py-2 text-xs text-gray-500 font-vix">PALMARÈS</button>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="card-cyber p-4 border-l-yellow-500">
-                        <div class="flex justify-between">
-                            <span class="text-[10px] font-bold text-yellow-500 uppercase">Live Prediction (5.1)</span>
-                            <span class="text-[10px] text-gray-500">POOL : 15k VC</span>
-                        </div>
-                        <h3 class="font-bold my-2">SCORE FINAL VIX vs KC</h3>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="alert('Pari enregistré')" class="bg-gray-900 p-2 text-xs rounded hover:border-cyan-400 border border-transparent">VIX WIN (3-1)</button>
-                            <button onclick="alert('Pari enregistré')" class="bg-gray-900 p-2 text-xs rounded hover:border-cyan-400 border border-transparent">VIX WIN (3-2)</button>
-                        </div>
-                    </div>
-                </div>
-            `;
+        function showDetail(id) {
+            const m = MATCHES.find(x => x.id == id);
+            document.getElementById('view-list').style.display='none';
+            document.getElementById('view-detail').style.display='block';
+            document.getElementById('detail-teams').innerText = m.t1 + " VS " + m.t2;
+            document.getElementById('detail-hour').innerText = m.h;
         }
+        function showList() { document.getElementById('view-list').style.display='block'; document.getElementById('view-detail').style.display='none'; }
 
-        function renderPalmares() {
-            document.getElementById('app-content').innerHTML = `
-                <div class="flex gap-2 mb-4">
-                    <button onclick="renderEsport()" class="flex-1 border border-gray-800 py-2 text-xs text-gray-500 font-vix">CALENDRIER</button>
-                    <button class="flex-1 vix-btn py-2 text-xs font-bold text-cyan-400">PALMARÈS</button>
-                </div>
-                <div class="card-cyber p-4 mb-4">
-                    <div class="flex items-center gap-4">
-                        <i class="material-icons text-4xl text-yellow-500">emoji_events</i>
-                        <div>
-                            <h3 class="font-bold">Winged Deer Tourney</h3>
-                            <a href="https://liquipedia.net" target="_blank" class="text-[10px] text-cyan-400 underline uppercase">View on Liquipedia (2.1)</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- SECTION 2.3 : BOUTIQUE "BLACK MARKET" ---
-        function renderMarket() {
-            setActive('market');
-            document.getElementById('app-content').innerHTML = `
-                <div class="mb-4">
-                    <h2 class="text-sm font-bold text-purple-400 mb-1">BLACK MARKET</h2>
-                    <p class="text-[10px] text-gray-500 italic uppercase">Dépense tes Vix-Coins ici</p>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="card-cyber p-3 text-center bg-purple-900/5">
-                        <div class="relative w-16 h-16 mx-auto mb-2">
-                             <div class="absolute inset-0 border-2 border-cyan-400 rounded shadow-[0_0_10px_cyan]"></div>
-                             <i class="material-icons mt-4">person</i>
-                        </div>
-                        <h4 class="text-[10px] font-bold">CADRE NÉON CYAN</h4>
-                        <button onclick="buy(150, 'Cadre Cyan')" class="w-full mt-2 vix-btn py-1 text-[10px]">150 VC</button>
-                    </div>
-
-                    <div class="card-cyber p-3 text-center bg-purple-900/5">
-                        <div class="text-2xl mb-2 font-vix text-purple-400">"OG 2024"</div>
-                        <h4 class="text-[10px] font-bold">TITRE DE PROFIL</h4>
-                        <button onclick="buy(300, 'Titre OG')" class="w-full mt-2 vix-btn py-1 text-[10px]">300 VC</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- SECTION 2.4 : LADDER & SAISONS ---
-        function renderLadder() {
-            setActive('ladder');
-            document.getElementById('app-content').innerHTML = `
-                <div class="bg-cyan-900/10 p-4 rounded mb-6 flex justify-between items-center border border-cyan-400/30">
-                    <div>
-                        <div class="text-[10px] text-cyan-400 uppercase">Saison 1: VIX-PASS</div>
-                        <div class="text-xs font-bold font-vix">TOP 3 WIN PHYSICAL PRIZES (2.4)</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-[10px] text-gray-500 uppercase">Fin dans</div>
-                        <div class="text-xs font-bold text-purple-400">44 JOURS</div>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between p-3 bg-white/5 rounded">
-                        <span class="text-cyan-400 font-vix">#1</span>
-                        <span class="flex-1 ml-4 text-xs uppercase">Agent_Cosmo</span>
-                        <span class="font-vix text-xs">12,450 VC</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-purple-500/20 rounded border border-purple-500/50">
-                        <span class="text-white font-vix">#${state.rank}</span>
-                        <span class="flex-1 ml-4 text-xs uppercase">Toi (Agent_${Math.floor(Math.random()*1000)})</span>
-                        <span class="font-vix text-xs">${state.vixCoins} VC</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- LOGIQUE FONCTIONNELLE ---
-
-        function setActive(id) {
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-tab'));
-            document.getElementById('tab-' + id).classList.add('active-tab');
-            window.scrollTo(0,0);
-        }
-
-        function claimDaily() {
-            if(!state.dailyClaimed) {
-                state.vixCoins += 50;
-                state.dailyClaimed = true;
-                updateUI();
-                renderHome();
-                alert("SYSTÈME : +50 Vix-Coins injectés.");
-            }
-        }
-
-        function redeemCode() {
-            const val = document.getElementById('stream-code').value.toUpperCase();
-            if(val === "VIX2026") {
-                state.vixCoins += 100;
-                updateUI();
-                alert("SYNC RÉUSSIE : +100 VC gagnés (Watch-to-Earn).");
-                document.getElementById('stream-code').value = "";
-            } else {
-                alert("ERREUR : Code d'authentification invalide.");
-            }
-        }
-
-        function buy(cost, item) {
-            if(state.vixCoins >= cost) {
-                state.vixCoins -= cost;
-                updateUI();
-                alert(`MARKET : ${item} acquis. Équipement disponible dans le menu Avatar.`);
-                renderMarket();
-            } else {
-                alert("SOLDE INSUFFISANT : Gagne plus de VC sur Twitch.");
-            }
-        }
-
-        // Initialisation
-        updateUI();
-        renderHome();
+        window.onload = () => { Auth.init(); renderMatches(); };
     </script>
 </body>
 </html>
