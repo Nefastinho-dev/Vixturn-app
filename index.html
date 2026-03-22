@@ -283,4 +283,112 @@
         window.onload = () => { Auth.init(); renderMatches(); };
     </script>
 </body>
+    <style>
+    /* Styles pour les nouveaux éléments */
+    .feat-btn { background: #1a1a1a; border: 1px dashed var(--vix-cyan); color: white; margin-top: 15px; }
+    .vix-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--vix-black); z-index: 3000; display: none; flex-direction: column; }
+    .vix-modal.active { display: flex; }
+    .modal-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--vix-purple); }
+    
+    /* Style Discord Vixturn */
+    .disc-container { display: flex; height: 100%; overflow: hidden; }
+    .disc-channels { width: 80px; background: rgba(0,0,0,0.4); border-right: 1px solid #222; display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 15px; }
+    .channel-icon { width: 45px; height: 45px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; border: 2px solid transparent; }
+    .channel-icon.active { border-color: var(--vix-cyan); border-radius: 15px; background: var(--vix-purple); }
+    .disc-main { flex: 1; display: flex; flex-direction: column; background: rgba(10,10,15,0.5); }
+    .disc-chat { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+    .msg { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 5px; border-left: 3px solid var(--vix-purple); }
+    .msg-author { font-weight: bold; font-size: 0.8rem; color: var(--vix-cyan); margin-bottom: 3px; display: flex; justify-content: space-between; }
+    .role-badge { font-size: 0.6rem; padding: 2px 5px; background: var(--vix-purple); border-radius: 3px; color: white; margin-left: 5px; }
+    .disc-input { padding: 15px; background: #0a0a0a; border-top: 1px solid #222; display: flex; gap: 10px; }
+    .disc-input input { flex: 1; background: #151515; border: 1px solid #333; color: white; padding: 10px; border-radius: 5px; }
+</style>
+
+<script>
+    (function injectVixFeatures() {
+        const comptePage = document.getElementById('page-compte');
+        
+        // 1. Création du conteneur de boutons
+        const featDiv = document.createElement('div');
+        featDiv.innerHTML = `
+            <button class="vix-btn feat-btn" onclick="toggleSecretMenu()">FONCTIONNALITÉS</button>
+            <div id="secret-menu" style="display:none; margin-top:10px; animation: fadeIn 0.3s;">
+                <button class="vix-btn btn-outline" style="width:100%" onclick="promptVixCode()">ENTRER UN CODE</button>
+            </div>
+        `;
+        comptePage.appendChild(featDiv);
+
+        // 2. Création de la modale Discord
+        const discordModal = document.createElement('div');
+        discordModal.id = 'vix-discord';
+        discordModal.className = 'vix-modal';
+        discordModal.innerHTML = `
+            <div class="modal-header">
+                <div style="font-family:'Orbitron'; color:var(--vix-cyan)">VIX-NET // ENCRYPTED SERVER</div>
+                <div onclick="closeDiscord()" style="cursor:pointer; color:var(--vix-red)">[ QUITTER ]</div>
+            </div>
+            <div class="disc-container">
+                <div class="disc-channels">
+                    <div class="channel-icon active">V</div>
+                    <div class="channel-icon">#</div>
+                    <div class="channel-icon">🎯</div>
+                </div>
+                <div class="disc-main">
+                    <div style="padding:10px; font-size:0.7rem; color:#666; border-bottom:1px solid #222">SALON: #general-ops</div>
+                    <div class="disc-chat" id="disc-messages">
+                        <div class="msg">
+                            <div class="msg-author">SYSTEM <span class="role-badge">BOT</span></div>
+                            <div class="msg-text">Bienvenue sur le serveur crypté Vixturn. Connexion établie.</div>
+                        </div>
+                        <div class="msg">
+                            <div class="msg-author">COACH NEFASTINHO <span class="role-badge" style="background:var(--vix-red)">ADMIN</span></div>
+                            <div class="msg-text">Agents, préparez-vous pour les prochains matchs. Le protocole est actif.</div>
+                        </div>
+                    </div>
+                    <div class="disc-input">
+                        <input type="text" id="chat-msg" placeholder="Envoyer un message crypté...">
+                        <button class="btn-outline" onclick="sendFakeMsg()">SEND</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(discordModal);
+    })();
+
+    // Fonctions Logiques
+    function toggleSecretMenu() {
+        const m = document.getElementById('secret-menu');
+        m.style.display = (m.style.display === 'none') ? 'block' : 'none';
+    }
+
+    function promptVixCode() {
+        const code = prompt("Veuillez entrer l'identifiant de sécurité :");
+        if (code === "Vix-disc-@team-18") {
+            document.getElementById('vix-discord').classList.add('active');
+        } else if (code !== null) {
+            alert("CODE INVALIDE. TENTATIVE DE CONNEXION ÉCHOUÉE.");
+        }
+    }
+
+    function closeDiscord() {
+        document.getElementById('vix-discord').classList.remove('active');
+    }
+
+    function sendFakeMsg() {
+        const input = document.getElementById('chat-msg');
+        if (!input.value) return;
+        const chat = document.getElementById('disc-messages');
+        const user = JSON.parse(localStorage.getItem('vix_session')) || {pseudo: "Agent"};
+        
+        const newMsg = document.createElement('div');
+        newMsg.className = 'msg';
+        newMsg.innerHTML = `
+            <div class="msg-author">${user.pseudo.toUpperCase()} <span class="role-badge">AGENT</span></div>
+            <div class="msg-text">${input.value}</div>
+        `;
+        chat.appendChild(newMsg);
+        chat.scrollTop = chat.scrollHeight;
+        input.value = "";
+    }
+</script>
 </html>
